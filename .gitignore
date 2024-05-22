@@ -1,0 +1,10 @@
+outputs
+*.sw[pno]
+# Python
+*.pyc
+*.pyo
+__pycache__/
+
+# Environments
+.env
+venv/

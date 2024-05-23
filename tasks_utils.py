@@ -35,6 +35,8 @@ def create_review_task(agent):
             "Ensure that the plan is as efficient as possible without any "
             "unnecessary steps or overlaps. Also, confirm that there are no "
             "missing elements in the plan that could prevent it from achieving the goal."
+            "Each task should require unique skill or expertise. "
+            "If two or more tasks need similar expertise then it should be combined into one"
         ),
         expected_output=(
             "Final list of tasks after revision based on critical review. "

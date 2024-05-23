@@ -7,6 +7,7 @@ from langchain_groq import ChatGroq
 from agents import create_critic, create_role_creator, create_strategy_maker
 from models import AgentTaskList, Character
 from tasks import create_plan_task, create_review_task, create_team_task
+from tools import get_tools
 
 
 def create_crew(agents, tasks, process=Process.sequential, manager_llm=None):
@@ -29,7 +30,8 @@ def create_crew(agents, tasks, process=Process.sequential, manager_llm=None):
 
 
 def main(goal):
-    llm = ChatGroq(model="llama3-8b-8192", max_tokens=2048)
+    llm = ChatGroq(model="llama3-70b-8192", max_tokens=2048)
+    tools = get_tools()
     strategy_maker = create_strategy_maker(llm)
     critic = create_critic(llm)
     plan_task = create_plan_task(strategy_maker)
@@ -60,6 +62,7 @@ def main(goal):
             role=character.role,
             goal=character.goal,
             backstory=character.backstory,
+            tools = tools,
             allow_delegation=False,
             llm=llm,
             verbose=True,
@@ -69,17 +72,18 @@ def main(goal):
             Task(
                 description=task.description,
                 expected_output=task.expected_output,
+                human_input=True,
                 agent=agent,
             )
         )
 
     master_crew = create_crew(
-        agents=agents, tasks=tasks, process=Process.hierarchical, manager_llm=llm
+        agents=agents, tasks=tasks #, process=Process.hierarchical, manager_llm=llm
     )
 
     master_crew.kickoff()
 
 
 main(
-    "Develop an MVP for AI application for interview preparation. The application is for personal. It generate interview questions for given job reqiurements. transcribe user answer audio using whisper.cpp and review the answer with a lanrge language model providing feedback. It is a cli app intented to run from terminal on mac."
+        "Do an online research to find the freelancing platforms for software engineers, devops and AI/ML engineers. Make a comprehensive report in markdown format, highlighting the salient features of each. Highlight pro and cons of each. The report should facilitate easy comparison as well as information to onboarding on the platform"
 )

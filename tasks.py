@@ -11,7 +11,9 @@ def create_plan_task(agent):
             "The the plan must ensure the high quality of the work. "
             "The plan must consider the efficient execution by divide "
             "and conquer when ever possible. "
-            "There should not be any overlap in the scope of steps."
+            "There should not be any overlap in the scope of steps. "
+            "Make sure that the the plan is not too granular, the plan "
+            "should have not more than 5 tasks."
         ),
         expected_output=(
             "Output the list of tasks. "
@@ -40,6 +42,7 @@ def create_review_task(agent):
             "and expected_output fields."
         ),
         output_json=AgentTaskList,
+        human_input=True,
         agent=agent,
     )
     return review_plan

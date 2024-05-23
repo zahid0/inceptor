@@ -73,7 +73,6 @@ def main(goal, llm=None, embedder=None):
             Task(
                 description=task.description,
                 expected_output=task.expected_output,
-                human_input=True,
                 agent=agent,
             )
         )

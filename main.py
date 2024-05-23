@@ -47,6 +47,9 @@ def main(goal, llm=None, embedder=None):
     tasks = []
     agents = []
 
+    llm_args = {}
+    if llm is not None:
+        llm_args["llm"] = llm
     for task in tasks_list.tasks:
         agent_json = team_setup_crew.kickoff(
             inputs={
@@ -62,8 +65,8 @@ def main(goal, llm=None, embedder=None):
             backstory=character.backstory,
             tools = tools,
             allow_delegation=False,
-            llm=llm,
             verbose=True,
+            **llm_args,
         )
         agents.append(agent)
         tasks.append(

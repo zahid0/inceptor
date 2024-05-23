@@ -2,7 +2,6 @@ import os
 
 from crewai import Agent, Crew, Task
 from crewai.process import Process
-from langchain_groq import ChatGroq
 
 from agents import create_critic, create_role_creator, create_strategy_maker
 from models import AgentTaskList, Character
@@ -29,8 +28,7 @@ def create_crew(agents, tasks, process=Process.sequential, manager_llm=None):
     )
 
 
-def main(goal):
-    llm = ChatGroq(model="llama3-70b-8192", max_tokens=2048)
+def main(goal, llm=None):
     tools = get_tools()
     strategy_maker = create_strategy_maker(llm)
     critic = create_critic(llm)
@@ -82,8 +80,3 @@ def main(goal):
     )
 
     master_crew.kickoff()
-
-
-main(
-        "Do an online research to find the freelancing platforms for software engineers, devops and AI/ML engineers. Make a comprehensive report in markdown format, highlighting the salient features of each. Highlight pro and cons of each. The report should facilitate easy comparison as well as information to onboarding on the platform"
-)

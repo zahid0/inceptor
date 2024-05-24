@@ -87,12 +87,15 @@ def execute(tasks_json, llm=None, embedder=None):
             **llm_args,
         )
         agents.append(agent)
-        task = Task(
-            description=task.description,
-            expected_output=task.expected_output,
-            agent=agent,
-            context=context,
-        )
+        task_args = {
+            "description": task.description,
+            "expected_output": task.expected_output,
+            "agent": agent,
+            "context": context,
+        }
+        if context is not None:
+            task_args["context"] = [context]
+        task = Task(**task_args)
 
         tasks.append(task)
         context = task  # Update the context for the next iteration

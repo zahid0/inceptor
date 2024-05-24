@@ -55,11 +55,11 @@ def plan(goal, llm=None, embedder=None):
         )
         team_creation_tasks.append(new_task)
 
-    team_setup_crew = create_crew(
-        agents=[agent_creator], tasks=team_creation_tasks, embedder=embedder
-    )
+        team_setup_crew = create_crew(
+            agents=[agent_creator], tasks=[new_task], embedder=embedder
+        )
 
-    team_setup_crew.kickoff()
+        team_setup_crew.kickoff()
     return tasks_json
 
 

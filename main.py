@@ -73,6 +73,7 @@ def execute(tasks_json, llm=None, embedder=None):
     tasks = []
     agents = []
 
+    context = None
     for i, task in enumerate(tasks_list.tasks):
         with open(f"outputs/role-{i}.json", "r") as f:
             character = Character.parse_raw(f.read())
@@ -86,13 +87,15 @@ def execute(tasks_json, llm=None, embedder=None):
             **llm_args,
         )
         agents.append(agent)
-        tasks.append(
-            Task(
-                description=task.description,
-                expected_output=task.expected_output,
-                agent=agent,
-            )
+        task = Task(
+            description=task.description,
+            expected_output=task.expected_output,
+            agent=agent,
+            context=context,
         )
+
+        tasks.append(task)
+        context = task  # Update the context for the next iteration
 
     master_crew = create_crew(
         agents=agents,

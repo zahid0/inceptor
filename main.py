@@ -11,7 +11,7 @@ def create_crew(agents, tasks, process=None, manager_llm=None, embedder=None):
         "agents": agents,
         "tasks": tasks,
         "verbose": 2,
-        "memory": True,
+        "memory": False,
     }
     if embedder is not None:
         crew_kwargs["embedder"] = embedder
@@ -22,13 +22,13 @@ def create_crew(agents, tasks, process=None, manager_llm=None, embedder=None):
     return Crew(**crew_kwargs)
 
 
-def main(goal, llm=None, embedder=None):
-    tools = get_tools()
-    print(tools)
+def plan(goal, llm=None, embedder=None):
     strategy_maker = create_agent(role="Strategy Maker", llm=llm)
     critic = create_agent(role="Strategy Reviewer", llm=llm)
     plan_task = tasks_utils.create_plan_task(strategy_maker)
-    review_task = tasks_utils.create_review_task(critic)
+    review_task = tasks_utils.create_review_task(
+        critic, output_file="outputs/tasks.json"
+    )
     planning_crew = create_crew(
         agents=[strategy_maker, critic],
         tasks=[plan_task, review_task],
@@ -38,26 +38,44 @@ def main(goal, llm=None, embedder=None):
     tasks_list = AgentTaskList.parse_raw(tasks_json)
 
     agent_creator = create_agent(role="Leader", llm=llm)
-    team_creation_task = tasks_utils.create_team_task(agent_creator)
+
+    team_creation_tasks = []
+    # Iterate over tasks in tasks_list to create new tasks
+    for index, task in enumerate(tasks_list.tasks):
+        # Generate output file name
+        output_file = f"outputs/role-{index}.json"
+
+        # Create a new task using the updated function signature
+        new_task = tasks_utils.create_team_task(
+            agent=agent_creator,  # Assuming the same agent for simplicity
+            output_file=output_file,
+            description=task.description,
+            expected_output=task.expected_output,
+            goal=goal,
+        )
+        team_creation_tasks.append(new_task)
+
     team_setup_crew = create_crew(
-        agents=[agent_creator], tasks=[team_creation_task], embedder=embedder
+        agents=[agent_creator], tasks=team_creation_tasks, embedder=embedder
     )
+
+    team_setup_crew.kickoff()
+    return tasks_json
+
+
+def execute(tasks_json, llm=None, embedder=None):
+    tools = get_tools()
+    tasks_list = AgentTaskList.parse_raw(tasks_json)
+    llm_args = {}
+    if llm is not None:
+        llm_args["llm"] = llm
 
     tasks = []
     agents = []
 
-    llm_args = {}
-    if llm is not None:
-        llm_args["llm"] = llm
-    for task in tasks_list.tasks:
-        agent_json = team_setup_crew.kickoff(
-            inputs={
-                "description": task.description,
-                "expected_output": task.expected_output,
-                "goal": goal,
-            }
-        )
-        character = Character.parse_raw(agent_json)
+    for i, task in enumerate(tasks_list.tasks):
+        with open(f"outputs/role-{i}.json", "r") as f:
+            character = Character.parse_raw(f.read())
         agent = Agent(
             role=character.role,
             goal=character.goal,

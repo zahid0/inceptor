@@ -16,3 +16,4 @@ class Character(BaseModel):
     role: str
     goal: str
     backstory: str
+    tools: List[str]

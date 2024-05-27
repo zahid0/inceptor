@@ -41,6 +41,11 @@ def plan(goal, llm=None, embedder=None):
 
     team_creation_tasks = []
     # Iterate over tasks in tasks_list to create new tasks
+    tools = get_tools()
+    tools_list = "\n".join(
+        f"{i+1}. Name: {tool.name}\n   Description: {tool.description}"
+        for i, tool in enumerate(tools)
+    )
     for index, task in enumerate(tasks_list.tasks):
         # Generate output file name
         output_file = f"outputs/role-{index}.json"
@@ -52,6 +57,7 @@ def plan(goal, llm=None, embedder=None):
             description=task.description,
             expected_output=task.expected_output,
             goal=goal,
+            tools_list=tools_list,
         )
         team_creation_tasks.append(new_task)
 
@@ -65,6 +71,7 @@ def plan(goal, llm=None, embedder=None):
 
 def execute(tasks_json, llm=None, embedder=None):
     tools = get_tools()
+
     tasks_list = AgentTaskList.parse_raw(tasks_json)
     llm_args = {}
     if llm is not None:

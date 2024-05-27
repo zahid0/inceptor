@@ -6,7 +6,7 @@ from models import AgentTaskList, Character
 def create_plan_task(agent):
     create_plan = Task(
         description=(
-            "Please generate a high level plan to achieve the following goal:\n"
+            "Please generate a high level plan to achieve the following goal:\n\n"
             "{goal}\n\n"
             "The plan should ensure high quality of the work. "
             "The plan should consider efficient execution by dividing "
@@ -48,7 +48,9 @@ def create_review_task(agent, output_file):
     return review_plan
 
 
-def create_team_task(agent, output_file, description, expected_output, goal):
+def create_team_task(
+    agent, output_file, description, expected_output, goal, tools_list
+):
     create_team = Task(
         description=(
             f"Please provide a detailed description of the role to hire for the following task:\n\n"
@@ -56,16 +58,16 @@ def create_team_task(agent, output_file, description, expected_output, goal):
             f"Expected Output: {expected_output}\n\n"
             f"The task is a part of the following final goal:\n\n"
             f"{goal}\n\n"
-            f"Please provide the details in the following format:\n"
-            f"1. role: name of the role. For example Software Engineer.\n"
-            f"2. goal: the clearly defined expertise of the role. This should be addressed in second person\n"
-            f"3. backstory: The backstory highlights capabilities of the role that make it most suitable for the task. This should be addressed in second person to the role"
+            f"A list of tools is available to be used, each with a name and description. Select the tools required by this role.\n\n"
+            f"The list of tools is as follows:\n"
+            f"{tools_list}"
         ),
         expected_output=(
             "Output the details of the role most suitable for the task in the following format:\n"
             "1. role: name of the role. For example Software Engineer.\n"
             "2. goal: the clearly defined expertise of the role. This should be addressed in second person\n"
-            "3. backstory: The backstory highlights capabilities of the role that make it most suitable for the task. This should be addressed in second person to the role"
+            "3. backstory: The backstory highlights capabilities of the role that make it most suitable for the task. This should be addressed in second person to the role\n"
+            f"4. tools: selected list of tools from the given tools required by this role."
         ),
         output_json=Character,
         output_file=output_file,

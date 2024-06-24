@@ -1,1 +1,1 @@
-- file name creation at crewai/memory/storage/rag_storage.py:66
+- fix file name creation at crewai/memory/storage/rag_storage.py:66. It sometimes becomes too long to be supported by OS

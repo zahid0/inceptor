@@ -1,0 +1,6 @@
+crewai
+crewai_tools
+langchain_community
+langchain-anthropic
+langchain-groq
+duckduckgo-search

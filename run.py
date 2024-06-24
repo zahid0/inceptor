@@ -1,8 +1,8 @@
 import os
 
-from langchain_groq import ChatGroq
+from langchain_openai import ChatOpenAI
 
-from main import execute
+from main import execute, plan
 
 embedder = {
     "provider": "openai",
@@ -12,13 +12,15 @@ embedder = {
         "api_base": "https://api.jina.ai/v1",
     },
 }
-llm = ChatGroq(model="llama3-8b-8192")
+llm = ChatOpenAI(
+    base_url="https://api.openai.com/v1", api_key=os.getenv("OPENAI_API_KEY")
+)
 
-# tasks_json = plan(
-#     "Do an online research to find the freelancing platforms for software engineers, devops and AI/ML engineers. Make a comprehensive report in markdown format, highlighting the salient features of each. Highlight pro and cons of each. The report should facilitate easy comparison as well as information to onboarding on the platform",
-#     llm=llm,
-#     embedder=embedder,
-# )
-with open("outputs/tasks.json") as f:
-    tasks_json = f.read()
+tasks_json = plan(
+    "Do an online research and make a comparative list of Free and Open source LLMs with less than 10B parameters. Compare them on the scores on various bencmarks. Write summary and pick the best among them best of the comparative analysis.",
+    llm=llm,
+    embedder=embedder,
+)
+# with open("outputs/tasks.json") as f:
+#     tasks_json = f.read()
 execute(tasks_json, llm=llm, embedder=embedder)

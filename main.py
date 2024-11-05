@@ -10,7 +10,7 @@ def create_crew(agents, tasks, process=None, manager_llm=None, embedder=None):
     crew_kwargs = {
         "agents": agents,
         "tasks": tasks,
-        "verbose": 2,
+        "verbose": True,
         "memory": False,
     }
     if embedder is not None:
@@ -34,7 +34,8 @@ def plan(goal, llm=None, embedder=None):
         tasks=[plan_task, review_task],
         embedder=embedder,
     )
-    tasks_json = planning_crew.kickoff(inputs={"goal": goal})
+    tasks_output = planning_crew.kickoff(inputs={"goal": goal})
+    tasks_json = tasks_output.json
     tasks_list = AgentTaskList.parse_raw(tasks_json)
 
     agent_creator = create_agent(role="Leader", llm=llm)
